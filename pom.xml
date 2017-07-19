@@ -294,7 +294,14 @@
 			<artifactId>fastjson</artifactId>
 			<version>1.2.30</version>
 		</dependency>
-
+		<!-- 依赖 第三方的jar -->
+		<dependency>
+			<groupId>ccb</groupId>
+			<artifactId>platform</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/ccb/Platform.jar</systemPath>
+		</dependency>
 	</dependencies>
 
 	<build>
