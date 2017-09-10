@@ -1,0 +1,58 @@
+package test;
+
+            //JAVA 和 数据库进行通信的模式
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
+public class TestJDBC {
+	public static void main(String[] args) throws Exception {
+
+		/*
+		 * 装载驱动类 
+		 * 把oracle.jdbc.OracleDriver装入内存
+		 * 而OracleDriver一装入到内存之后
+		 * 会自动完成对Connection实现类的初始化工作
+		 */
+		Class.forName("oracle.jdbc.OracleDriver");
+		
+		/*
+		 * 获取连接Connection对象
+		 * 获取Oracle对Connection接口的实现对象 
+		 * 该对象会完成对Oracle数据库连接工作
+		 */
+		String url = "jdbc:oracle:thin:@192.168.0.1:1521:tk";
+		String user = "tk";
+		String password = "tk";
+		// 返回Oracle提供的实现类Connection
+		// 接口的实现类对象
+		// 该对象一经创建, 和Oracle数据库服务器的
+		// 连接就建立好了
+		Connection conn = DriverManager
+		   .getConnection(url, user,password);
+		
+		// Connection的createStatement方法
+		// 返回Oracle对Statement的实现类对象
+		Statement stmt = conn.createStatement();
+		
+		ResultSet rs = 
+			  stmt.executeQuery("select id, name ,location from host");
+		//int rows = stmt.executeUpdate("insert into host values(...)");
+		
+		while(rs.next()) {
+			// rs.getXXX()
+			String id = rs.getString(1);
+			//String id = rs.getString("id");
+			String name = rs.getString(2);
+			String location = rs.getString(3);
+			System.out.println(id+","+name+","+location);
+		}
+		
+		rs.close();
+		stmt.close();
+		conn.close();
+		
+	}
+}

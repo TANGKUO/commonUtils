@@ -1,0 +1,129 @@
+package com.tarena.dms.dao;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+/**
+ * 封装对SERVICE表的CRUD
+
+ * DAO是对service表进行操作如：增加  删除  修改
+ *
+ * 
+ */
+
+// CREATE TABLE SERVICE(
+// ID NUMBER(11) CONSTRAINT SERVICE_ID_PK PRIMARY KEY,
+// ACCOUNT_ID NUMBER(11) NOT NULL, /*CONSTRAINT SERVICE_ACCOUNT_ID_FK REFERENCES
+// ACCOUNT(ID)*/
+// UNIX_HOST VARCHAR2(15) NOT NULL,
+// OS_USERNAME VARCHAR2(50) NOT NULL,
+// LOGIN_PASSWD VARCHAR2(30) NOT NULL,
+// STATUS CHAR(1) NOT NULL,
+// CREATE_DATE DATE NOT NULL,
+// PAUSE_DATE DATE,
+// CLOSE_DATE DATE,
+// COST_ID NUMBER(11) NOT NULL /*CONSTRAINT SERVICE_COST_ID_FK REFERENCES
+// COST(ID)*/
+// );
+
+public class ServiceDAO {
+	/**
+	 * 获取SERVICE表中的所有行
+	 */
+	public void findAll() throws ClassNotFoundException, SQLException {
+               //建立一个连接的对象
+		Connection conn = null; 
+ 
+               //建立一个发送select语句的方法
+		PreparedStatement stmt = null;
+
+               // 用于接受从服务器发过来的信息
+		ResultSet rs = null;
+		try {   
+                        //用于加载Oracle的类
+			Class.forName("oracle.jdbc.OracleDriver");
+
+                        //建立连接
+			conn = DriverManager.getConnection(
+					"jdbc:oracle:thin:@192.168.0.26:1521:tarena", "jsd1302", "jsd1302");
+                         
+                        //conn的 prepareStatement方法
+			stmt = conn.prepareStatement("select ID, ACCOUNT_ID, UNIX_HOST, OS_USERNAME, LOGIN_PASSWD, CREATE_DATE from SERVICE");
+
+			rs = stmt
+					.executeQuery();
+
+			while (rs.next()) {
+				System.out.println(rs.getInt("ID") + "," + rs.getInt("ACCOUNT_ID")
+						+ "," + rs.getString("UNIX_HOST") + ","
+						+ rs.getString("OS_USERNAME") + "," + rs.getString("LOGIN_PASSWD")
+						+ "," + rs.getDate("CREATE_DATE"));
+			}
+		} catch (ClassNotFoundException e) {
+			System.out.println("驱动类无法加载" + e.getMessage());
+			throw e;
+		} catch (SQLException e) {
+			System.out.println("数据库访问异常" + e.getMessage());
+			throw e;
+		} finally {
+			if (rs != null)
+				rs.close();
+			if (stmt != null)
+				stmt.close();
+			if (conn != null)
+				conn.close();
+		}
+	}
+              //此方法是用于给定的条件查结果
+	public void findByUsernameAndPwd(String username, String pwd)
+			throws ClassNotFoundException, SQLException {
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			Class.forName("oracle.jdbc.OracleDriver");
+			conn = DriverManager.getConnection(
+					"jdbc:oracle:thin:@192.168.0.26:1521:tarena", "jsd1302", "jsd1302");
+
+
+			String sql = "select ID, ACCOUNT_ID, " +
+					"UNIX_HOST, OS_USERNAME, " +
+					"LOGIN_PASSWD, CREATE_DATE " +
+					"from SERVICE " +
+					"where OS_USERNAME=? and LOGIN_PASSWD=?";
+			
+
+			stmt = conn.prepareStatement(sql);
+			
+			stmt.setString(1, username);
+			stmt.setString(2, pwd);
+			
+			rs = stmt
+					.executeQuery();
+
+			while (rs.next()) {
+				System.out.println(rs.getInt("ID") + "," + rs.getInt("ACCOUNT_ID")
+						+ "," + rs.getString("UNIX_HOST") + ","
+						+ rs.getString("OS_USERNAME") + "," + rs.getString("LOGIN_PASSWD")
+						+ "," + rs.getDate("CREATE_DATE"));
+			}
+		} catch (ClassNotFoundException e) {
+			System.out.println("驱动类无法加载" + e.getMessage());
+			throw e;
+		} catch (SQLException e) {
+			System.out.println("数据库访问异常" + e.getMessage());
+			throw e;
+		} finally {
+			if (rs != null)
+				rs.close();
+			if (stmt != null)
+				stmt.close();
+			if (conn != null)
+				conn.close();
+		}
+	}
+}

@@ -1,0 +1,513 @@
+--------------MySQL 语法-------------------
+1.数据库基础
+  1）有哪些数据？
+  2）数据的存储方式：
+     a. 文件 - 适合少量数据的存储，
+               如配置文件
+     b. 数据库 - 适合于大量数据的存储
+  3）常用的数据库：
+      Access,SQL Server,Oracle,DB2,MySQL
+  4)数据库中的概念：
+    DB - 数据库，用于存储数据的服务器端程序
+    Table - 表，数据存储的基本单元，
+         由行和列组成的二维结构。
+    Column - 列，字段，具有名称、大小、类型、
+         约束等属性。
+    Row - 行，记录，包含表中具体的数据
+           列1   列2
+     行1    1    小李
+     行2    2    小张
+--------------------------------------------
+2.MySQL数据库简介
+   1）MySQL是流行的开源的关系型数据库，
+   具有快速、存储量大、易于使用、跨平台等特点，
+，广泛使用在各种Web应用、中小型网站中。
+   2）MySQL的历史：
+      1996年 发布MySQL1.0
+      2000年  瑞典MySQL AB公司成立
+      2008年  Sun收购MySQL AB
+      2009年  Oracle收购SUN
+   3)MySQL的安装
+      my.ini MySQL主配置文件
+      与中文有关的字符编码：
+        [mysql]
+         default-character-set=gbk
+        [mysqld]
+         default-character-set=gbk
+      ----------------------------------
+      安装错误的解决方式：
+          卸载 
+          -->删除数据文件的目录
+（C:/Documents and Settings/All Users/Application Data/MySQL/MySQL Server 5.1/Data/)
+          -->重新安装
+   4）启动MySQL数据库：
+        作为windows服务启动和停止
+         net start mysql   启动mysql服务
+         net stop mysql    停止mysql服务
+         mysqld -remove mysql 手工删除mysql服务
+
+        连接MySQL数据库：
+          mysql [-h localhost] -u root -p[密码]
+          参数：-h 指定MySQL服务器名称
+                -u 指定用户名
+                -p 指定密码
+         Example:
+            mysql -u root -p123456
+            mysql -h localhost -u root -p
+   5）MySQL的体系结构(了解)
+    C/S结构 - 客户端通过网络协议连接MySQL服务器
+    具有可插入式的存储引擎 
+            - 存储引擎完成实际的I/O操作，
+              常用的存储引擎有MyISAM和InnoDB.
+              默认的存储引擎是InnoDB.
+------------------------------------------
+3. MySQL的常用语句：
+   1)show databases; -查看数据库
+   2)create database tarena; -创建数据库
+   3)use 数据库名称; -打开指定的数据库
+   4)create table    -创建表
+   5)show tables;    -查看当前数据库中有哪些表
+   6)desc 表名;      -查看表的结构
+   7)show create table 表名; -显示表的创建语句
+   8)select * from 表名; -查看表中的数据
+   9)select current_user(); -查看当前用户
+   10)select version(); -查看数据库版本
+   11）select now(),current_date(); -查看当前时间
+   12）status      -MySQL命令，不需要以分号结尾。
+                    用于查看数据库的状态 
+   13)?|help create database -查看帮助
+   14)exit -退出MySQL命令行
+-----------------------------------------
+4.SQL语句（重点）
+   1）什么是SQL - 结构化查询语言，
+          用于访问和数据库。
+          SQL-92定义了SQL语句的标准，
+          不同的数据库都支持SQL-92，
+          但都有自己的扩展。
+（不同数据库之间的SQL语句不完全兼容）
+   2）SQL语句的分类：
+      DDL(数据定义语言) - create,alter,drop
+      DML(数据操纵语言) - select,insert,update,delete
+      TCL(事务控制语言) - commit,rollback
+-------------------------------------------
+5.DDL语句 - 用于创建、修改、删除数据库中
+        各种对象（如表）的结构
+ 5.1 操作数据库 
+ 1)create database gsd1204; -创建数据库
+    create database if not exists gsd1204;
+    create database gsd1204 
+        default character set utf8;
+  2)alter database gsd1204
+        default character set gbk;
+    -修改数据库的结构
+  3)drop database gsd1204;
+    drop database if exists gsd1204;
+ 5.2 操作表
+   1）create table [if not exists] 表名(
+         字段名1 类型 
+ [null|not null][primary key][auto_increment],
+         字段名2 类型
+      )[Engine=InnoDB]
+       [default character set gbk|utf8];
+      -----------------------------------
+         auto_increment用于设置自动增长列
+         缺省字段允许为空(null)
+      -----------------------------------
+      常用的数据类型：
+        int - 占4个字节，整数
+        decimal(p,s) - 浮点型，p代表精度(数值长度，包括小数位数)，
+              s代表小数位数.
+              如price decimal(5,2)的最大值999.99
+        char[(n)] - 存储固定长度的字符，
+              默认长度为1
+        varchar(n) - 存储可变长度的字符，
+                     按照实际长度存储。
+            name1 char(8)     
+             - name1="abc",占用8个字节
+            name2 varchar(8)
+             - name1="abc",占用3(utf8)或6(gbk)个字节
+        date - 日期类型，形如yyyy-MM-dd
+        datetime - 日期时间类型，
+               形如yyyy-MM-dd hh:mm:ss
+     --------------------------------------
+Task.创建部门表：
+        DeptNo int 主键 部门编号
+        DName  varchar(30) 非空 部门名称
+        DLoc   varchar(100) 部门位置
+  -----------------------------------------
+  2）alter table dept 
+        add create_date date; -添加新列
+     alter table dept 
+        add tmp int first; -添加新列，使之成为第一个字段
+     alter table dept 
+        add totalnum int after DName;
+     alter table dept 
+        drop column create_date; -删除列
+     alter table dept 
+        change 旧列名 新列名 类型; -修改列
+     alter table dept
+        rename to dept2; -重命名表 
+  3)drop table [if exists] 表名; -删除表
+Task.创建职员表Emp:
+    create table Emp(
+      empno int primary key,
+      ename varchar(30) not null,
+      job varchar(30),
+      mgr int,
+      hiredate date,
+      sal decimal(8,2),
+      comm decimal(8,2),
+      deptno int);
+------------------------------------
+6.DML语句 - insert,update,delete,select
+  6.1 insert语句
+   语法：
+     insert into 表名 
+         [(字段列表)] values (值的列表);
+   1)在Dept表中插入数据
+     insert into Dept (dname,dloc)
+         values('Android研究院','北京');
+     insert into Dept
+         values(null,'移动开发部','深圳');
+     (省略字段列表，需要提供所有的值，
+       null对应自动增长列)
+   2）同时插入多条记录：
+     语法：
+     insert into 表名 [(字段列表)]
+        values (值的列表),(值的列表);
+   Task.在Emp表中增加一条记录
+ empno ename job   mgr  hiredate,sal,comm,deptno
+ 7800  scott clerk        2010-6-1          1
+
+  insert into Emp values
+    (7800,'scott','clerk',null,'2010-06-01',
+     null,null,1);
+  insert into Emp
+   (empno,ename,job,hiredate,deptno)
+  values
+   (7802,'Mike','manager','2006-01-01',1),
+   (7804,'Bill','PM',current_date(),2),
+   (7900,'Kite','clerk','2003-1-1',1);
+-----------------------------------------
+6.2 select语句
+  1)语法：
+      select *|字段列表 
+       [from 表名 as 别名]
+       [where 条件表达式]
+       [order by 字段1 asc|desc,
+                 字段2 asc|desc];
+  2)Example：
+   SQL> select * from emp order by hiredate;
+   SQL> select deptno,empno,ename,mgr from emp;
+   使用别名(字段和表都可以设置别名)
+   SQL> select deptno as 编号,ename 姓名
+        from emp as e
+        where e.deptno=1;
+  3)where子句 - 用于筛选记录
+   在where子句中使用的运算符有：
+     =, != , <>, >, >=, <, <=, like
+     IN, Between...And...
+     And, Or, Not,Not IN,Not Between...And...
+     is null,is not null
+     Exists
+   Example:
+   查询部门1的职员信息：
+   SQL> select * from Emp where deptno=1;
+   查询姓名中包含字母i的人员信息：
+   模糊查询：%匹配所有，_匹配单个字符
+   SQL>select * from Emp
+     where ename like '%i%'
+   查询部门1,2,3部门中的人员信息：
+   IN用于匹配离散结果。
+   SQL>select * from Emp
+         where deptno in(1,2,3);
+   查询工资在2000到4000之间的人员信息：
+   SQL>select * from Emp
+      where sal>=2000 and sal<=4000;
+   SQL>select * from Emp
+      where sal between 2000 and 4000;
+   SQL>select * from Emp
+      where not (sal<2000 or sal>4000);
+  4)使用limit子句(SQL-92不支持该语法)：
+   语法：select ... from ... 
+         where... order by...
+         limit m,n
+         m用于指定结果集中的起始序号，
+          从0开始。
+         n指定选取的记录的个数。
+    Task.从Emp表中选取第6页(页数从1开始)的
+         数据，每页10条
+    SQL>select * from emp limit 50,10;
+
+  5)select语句执行过程：
+   select deptno,empno,ename
+     from emp 
+     where deptno=1
+     order by hiredate;
+     (from-->where-->select-->order by)
+   Step1. 选取from子句的表
+   Step2. 通过where子句筛选满足条件的记录，
+          将这些记录放在结果集中
+   Step3. 通过select子句获取结果集中包括
+          的字段
+   Step4. 通过order by子句对结果集中的记录
+   进行排序，并将结果集返回给客户端。
+---------------------------------------
+6.3 update语句
+   1）语法：
+        update 表名 
+          set 字段1=值1，字段2=值2
+          [where 条件表达式];
+   2)Example:
+     //将职员7800的工资修改为5000
+   SQL>update Emp set sal=5000 where empno=7800;
+     //将奖金comm设为工资的1/10
+   SQL>update Emp set comm=sal/10;
+6.4 delete语句 - 删除数据库中符合条件的记录
+   语法：
+     delete from 表名 [where 条件表达式];
+  （区分drop table和delete from 表名）
+--------------------------------------
+6.5 分组查询
+  1）分组函数：
+        count - 计算符合条件的记录的个数
+        sum   - 求和
+        avg   - 求平均值
+        max   - 求最大值
+        min   - 求最小值
+   Example:
+   计算表中记录的个数：
+   SQL>select count(*) from Emp;
+   计算表中工资的总额：
+   SQL>select sum(sal) total from emp;
+   ??如何计算部门1的工资总额？
+   ??如何显示部门及对应的工资总额？
+ 2）分组语句的语法：
+   select 分组字段,分组函数 
+     from...where...
+     group by 分组字段
+    (在select子句中只能出现分组字段和分组函数)
+   SQL>select deptno,sum(sal),avg(sal)
+         from Emp 
+         group by deptno;
+ 3)使用having限制分组条件：
+   语法：
+   select ... from ... where ...
+    group by 分组字段 having 分组条件
+   分组条件：只能使用分组函数，
+       不能出现普通字段
+ Task.显示部门及对应的平均工资，
+   只显示平均工资大于8200的信息
+  SQL>select deptno,avg(sal) from Emp
+   where mgr is not null
+   group by deptno having avg(sal)>8200;
+
+ 4)分组语句的执行过程：
+     from-->where-->group by
+                     -->select-->having
+     Step1.选取表Emp
+     Step2.筛选出3条记录(mgr is not null)
+     Step3.按照deptno进行分组
+        deptno  empno...
+          1      7800
+          1      7900
+        ------------------
+          2      7804
+    Step4. 在组内按照分组函数进行计算
+    Step5. 按照having的分组条件进行筛选，
+不满足条件的记录排除结果集。
+                  
+---------------------------------------
+内容回顾：
+   1）MySQL的基本语句：
+        show databases,show tables,
+        desc,help(?),exit,\c
+   2)SQL语句（重点)
+      DDL:create,alter,drop
+      DML:select,insert,update,delete
+        insert into table_name 
+         [(field_list)] 
+        values (value_list)[,(value_list)]
+       
+       update table_name set field=value
+         where condition_expr;
+       delete from table_name
+         where condition_expr;
+       select *|field_list 
+          from table_name [as alias]
+          [where condition_expr]
+          [order by field asc|desc]
+          [group by group_filed]
+          [having group_condition]
+       where子句中的运算符：
+          = != <> > >= < <= like
+          IN Between...And..
+          is null
+          And Or Not
+-------------------------------------
+1.数据库约束(Constraint)
+   1.1 数据库约束的意义：
+         用于保证数据库中数据的完整性和
+         一致性。
+   1.2 约束的分类：
+       主键约束，非空约束，唯一性约束，外键约束
+   1.3 主键约束
+     1）主键 - Primary Key,PK,
+               用于保证表中的每一条记录具有
+               唯一的标识。
+               主键列不能为null,
+               主键列的值不能重复。
+     2）添加主键的方式：
+       a. create table table_name(
+           field type primary key
+          )
+       b.表级约束的写法：
+          create table table_name(
+            field1 type1,
+            field2 type2,
+            [constraint pk_field1]
+              primary key(field1)
+         );
+      SQL>create table Category(
+             cid int,
+             cname varchar(30),
+             constraint pk_cid primary key(cid)
+          );  
+     3)联合主键
+      需求：订单中间表
+             order_id product_id
+                 1      101
+                 1      102
+                 2      101
+                 2      101(违反主键约束)
+      SQL>create table order_products(
+           order_id int,
+           product_id int,
+           primary key(order_id,product_id)
+          );
+  1.4 非空约束
+    1)非空约束用于保证字段的值是否可以为null
+    2)添加非空约束的方式：
+      create table table_name(
+         field type null|not null
+      )
+      (默认值是null)
+      SQL>alter table Category
+  change cname cname varchar(30) not null;
+      
+  1.5 唯一性约束
+   1）唯一性约束用于保证字段的值不重复，
+      但可以为null。
+   2）添加唯一性约束的方式：
+     a. create table table_name(
+           field type unique
+         );
+     b. 表级约束的写法：
+        create table table_name(
+           field1 type1,
+           field2 type2,
+           [Constraint uni_fild2]
+            Unique(field2)
+       ); 
+   1.6 外键约束
+    1） 表Emp          表Dept
+        empno deptno    deptno
+         7800   1         1
+         7802   2         2
+       外键约束用于保证表中的字段的值
+来自于另一个表的主键或具有唯一约束的列。
+
+  2)添加外键约束的方式：
+    a. create table table_name(
+          field type 
+           [Constraint fk_field]
+           references table2_name(field2)
+       );
+     SQL>create table if not exists Category(
+          cid int primary key auto_increment,
+          cname varchar(30) unique
+         );
+         insert into Category 
+           values(null,'Computer2');
+         create table book(
+           bookId int primary key auto_increment,
+           title varchar(20) not null,
+           cid int 
+            Constraint fk_book_category
+            references Category(cid)
+         );
+    b.使用表级约束的写法：
+      create table table_name(
+        field1 type,
+        field2 type,
+        [Constraint fk_table1_table2]
+          foreign key (field2)
+           references table2(field)
+     );
+     SQL>drop table book;
+         create table book(
+           bookId int primary key auto_increment,
+           title varchar(30) not null,
+           cid int,
+           constraint fk_book_category_1 
+            foreign key(cid)             
+              references Category(cid)
+         );
+    c.删除外键约束的写法：
+        alter table table_name
+         drop foreign key(外键约束的名称);
+    d.添加外键约束的写法：
+        alter table table_name
+         add constraint 约束名称
+           foreign key(外键字段)
+           references table2_name(所引用的字段)；
+    Task.在Emp表中添加外键约束，
+    字段deptno引用Dept表的主键字段deptno.
+     SQL>alter table emp
+       add constraint fk_deptno_Dept
+        foreign key(deptno)
+         references dept(deptno); 
+      表Emp的结构：
+        empno int primary key
+              auto_increment     - 主键
+        ename varchar(20) 
+              not null unique    - 唯一性约束和非空约束 
+        deptno int not null,     - 外键字段
+        constraint fk_1
+           foreign key (deptno)
+             references dept(deptno) - 外键约束
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

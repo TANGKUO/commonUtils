@@ -1,0 +1,15 @@
+con = openConnection()
+con.prepareStatement;
+线程池
+连接池：商用的服务器都要有连接池，连接池是事先连接好的，等用完后要归还
+
+Wrapper 包装设计模式（手机 手机套）
+  Connection 接口
+事务： 1 conn.setAutoCommit(false) 把自动提交设置为手动提交 
+       2 conn.commit();提交事务
+       3 conn.rollback();回滚事务，也是撤消的意思
+批处理  1 pstm.addBatch(); 用于存放、积攒语句
+          此处要设置要积攒的大小
+        2 pstm.executeBatch(); 执行积攒的语句
+连接池（必须用）
+    
