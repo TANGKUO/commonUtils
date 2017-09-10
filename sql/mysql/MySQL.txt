@@ -478,7 +478,380 @@ Task.创建职员表Emp:
              references dept(deptno) - 外键约束
         
 
+------------------------------------------
 
+create database 表名  default character set gbk【utf-8】
+        [mysql]
+         default-character-set=gbk
+        [mysqld]
+         default-character-set=gbk
+      ----------------------------------
+    
+  启动MySQL数据库：
+        作为windows服务启动和停止
+         net start mysql   启动mysql服务
+         net stop mysql    停止mysql服务
+         mysqld -remove mysql 手工删除mysql服务
+
+        连接MySQL数据库：
+          mysql [-h localhost] -u root -p[密码]
+          参数：-h 指定MySQL服务器名称
+                -u 指定用户名
+                -p 指定密码
+         Example:
+            mysql -u root -p123456
+            mysql -h localhost -u root -p
+------------------------------------------
+3. MySQL的常用语句：
+   1)show databases; -查看数据库
+   2)create database tarena; -创建数据库
+   3)use 数据库名称; -打开指定的数据库
+   4)create table    -创建表
+   5)show tables;    -查看当前数据库中有哪些表
+   6)desc 表名;      -查看表的结构
+   7)show create table 表名; -显示表的创建语句
+   8)select * from 表名; -查看表中的数据
+   9)select current_user(); -查看当前用户
+   10)select version(); -查看数据库版本
+   11）select now(),current_date(); -查看当前时间
+   12）status      -MySQL命令，不需要以分号结尾。
+                    用于查看数据库的状态 
+   13)?|help create database -查看帮助
+   14)exit -退出MySQL命令行
+-----------------------------------------
+
+   SQL语句的分类：
+      DDL(数据定义语言) - create,alter,drop
+      DML(数据操纵语言) - select,insert,update,delete
+      TCL(事务控制语言) - commit,rollback
+-------------------------------------------
+5.DDL语句 - 用于创建、修改、删除数据库中
+        各种对象（如表）的结构
+ 操作数据库 
+ 1)create database gsd1204; -创建数据库
+    create database if not exists gsd1204;
+    create database gsd1204 
+        default character set utf8;
+ 
+ 操作表
+   1）create table [if not exists] 表名(
+         字段名1 类型 
+         字段名2 类型
+      )[default character set gbk|utf8];
+  
+-------------------------------------------------
+day02 内容回顾
+----------------------------------------------------------------
+1、表的创建（基本语法）
+     重点是表的语法及表中字段的类型和约束
+2、表的设计（表与表之间关系的建立）
+     重点考虑表与表之间关系
+      |--->many2one (FK)  :外键建立在多的一端
+      |--->one2many (FK)
+      |--->one2one (FK+UK):外间建立在哪一端根据实际需求而定
+      |--->many2many(中间表+FK)
+      说明： 掌握联合主键，外键的概念以及其建立方式
+      create table type_brand(
+        typeId int,
+        brandId varchar(200) ,
+        primary key( typeId,brandId) //联合主键（复合主键）
+        ）；
+      
+       alter table type_brand add foreign key (typeId)
+       references ProductType(id);
+
+       alter table type_brand add foreign key (brandId )
+       references ProductBrand(brandCode);
+       或者
+        create table type_brand(
+        typeId int,
+        brandId varchar(200) ,
+        primary key( typeId,brandId)， //联合主键（复合主键）
+        foreign key (typeId) references ProductType(id),
+        foreign key (brandId) references ProductBrand(brandCode)
+        ）；
+------------------------------------------------------------------------
+day03-1: 表的设计范式(创建表时应该遵循的一些原则):了解
+
+第一范式：字段不可再分. 
+
+create table Employee (
+ id int primary key auto_increment,
+ name varchar(200) not null,
+ salary decimal(10,2) default 0,
+ address varchar(50),
+)
+以上address 可再分（家庭地址，工作地址，出生地址，.....）
+
+修改以上表的设计，让其满足第一范式
+
+create table Employee (
+ id int primary key auto_increment,
+ name varchar(200) not null,
+ salary decimal(10,2) default 0,
+)
+create table Address(
+  id int primary key auto_increment,
+  zipcode varchar(10),
+  addr varchar(200),
+  employee_id int 
+)
+alter table address add foreign key (employee_id)
+references employee(id);
+
+第二范式： 非主属性（主键字段）不能部分依赖于主属性
+
+例如，现有一成绩表
+create table Grade(
+sid int,    --学生id (主键的一部分+外键)
+cid int,    --课程id (主键的一部分+外键)
+score decimal(5,2),--成绩
+cname  varchar(200), --课程名称
+primary key(sid,cid)--主键
+);
+
+现分析以上表是否满足第二范式： （不满足）
+
+将以上设计修改为如下形式：
+create table Grade(
+sid int,    --学生id (主键的一部分+外键)
+cid int,    --课程id (主键的一部分+外键)
+score decimal(5,2),--成绩
+primary key(sid,cid)--主键
+);
+
+create table course(
+id int primary key auto_increment,
+cname varchar(200)
+); 
+
+第三范式： 非主属性（主键字段）不能依赖于非主属性，即不能存在传递依赖
+
+create table student(
+sno int primary key auto_increment,
+sname varchar(200) not null,
+schoolName varchar(200) not null,
+schoolPhone varchar(50) 
+)
+
+以上表是否满足第三范式吗？（不满足）
+
+schoolPhone 依赖于 schoolName 
+
+建表时应该是所有的字段都依赖于主键
+
+将以上表修改如下：
+
+create table student(
+sno int primary key auto_increment,
+sname varchar(200) not null,
+school_Id int 
+)
+create table school(
+   id int primary key auto_increment,
+   schoolName varchar(200) not null,
+   schoolPhone varchar(50)
+)
+alter table student add foreign key(school_id)
+references school(id);
+-----------------------数据库中数据的查询 (重点)： select ------------------------------------------
+1.简单查询
+
+      语法： ? select 
+
+      1) 查询雇员表中所有的雇员信息 （hr: employees）
+    
+           select  * 
+           from employees;
+           其中：
+           select 确定列  （"*"代表所有列）
+           from 确定表
+
+           两条语句的执行顺序(from,select)
+     2)   查询所有部门信息 
+            select * from departments ;
+            或者
+            select department_id,department_name,location_id,manager_id
+            from departments;
+            说明：假如在java代码中编写sql语句，建议使用第二种形式
+
+     3） 查询部门表中部门id 和部门名称。(部分字段)
+            select department_id,department_name
+            from departments;      
+
+    4）  查询雇员的名字，薪水，入职日期
+            select first_name as name,salary,hire_date
+            from employees;
+    5 )   给每个雇员的薪水加300以后，查看一下值的是多少？
+            select first_name,salary+300 newsalary
+            from employees;
+
+2、排序查询 （对查询的结果进行排序） :order by 列名 {asc|desc}
+
+    1）查询所有雇员的名字和薪水，并按薪水降序排序       
+
+     select first_name,salary
+     from employees
+     order by salary desc; （其中desc 表示降序）
+
+    2) 查询所有雇员的名字和薪水，并按薪水降序排序  
+        薪水相同，按名字升序排序     
+
+     select first_name,salary
+     from employees
+     order by salary desc，first_name asc;  (其中asc 可以省略)
+
+3、分页查询 (限制返回记录的数目)
+
+     1） 查询所有雇员的名字和薪水，并按薪水降序排序 , 
+            取薪水最大的。
+
+     select first_name,salary
+     from employees
+     order by salary desc  
+     limit 1;  
+
+     2 )  查询所有雇员的名字和薪水，并按薪水降序排序 , 
+            取第二条和第三条记录
+
+     select first_name,salary
+     from employees
+     order by salary desc  
+     limit 1，2;   （含义为从第二条开始取，取2条）
+     
+    3）现有一张表，表中数据总计为21条，要求每页显式5条，总计分多少页。
+     
+          21%5==0？21/5:21/5+1
+
+    4) 现有 1,2,3,4,5,6几个页面上的页码（要求每页显示5条记录）
+        当点击页面的页码3时，数据库中如何取记录。
+        ........
+        limit（3-1）*5，5
+
+4、限制查询  （where 子句）： 只查询满足条件的记录
+
+     1) 查询薪水大于20000的雇员的名字和薪水以及入职日期
+
+         select first_name,salary,hire_date
+         from employees
+         where salary>20000;
+
+     2) 查询薪水在10000到20000之间的雇员的名字和薪水，入职日期
+  
+         select first_name,salary,hire_date
+         from employees
+         where salary>=10000 and salary <=20000;
+              
+         或者
+
+         select first_name,salary,hire_date
+         from employees
+         where salary between 10000 and  20000;
+    3) 查询薪水为10000或20000的雇员的名字，入职日期
+
+        select first_name,salary,hire_date
+         from employees
+         where salary=10000 or salary=20000;
+
+         或者 
+    
+         select first_name,salary,hire_date
+         from employees
+         where salary in (10000,20000);
+   4)  查询雇员名字中含有A这个字母的雇员的名字和薪水，入职日期
+        
+         select first_name,salary,hire_date
+         from employees
+         where first_name like '%A%'; (%代表0个或多个字符)
+
+  5)  查询雇员名字中以A这个字母打头的雇员的名字和薪水，入职日期
+        
+        select first_name,salary,hire_date
+         from employees
+         where first_name like 'A%'; 
+   
+  6)  查询雇员名字中第二个字母位A的雇员的名字和薪水，入职日期
+        
+        select first_name,salary,hire_date
+         from employees
+         where first_name like '_A%'; ("_"代表任意的一个字符) 
+
+  7)  查询1987年入职的员工的名字，薪水，入职日期 （两种方案）
+        
+        方案1：
+        select first_name,salary,hire_date
+        from employees
+        where year(hire_date)='1987'
+        方案2：
+        select first_name,salary,hire_date
+        from employees
+        where  hire_date  like '1987%';
+        方案3：
+        select first_name,salary,hire_date
+        from employees
+        where  substring(hire_date,1,4)='1987';
+        方案4：
+
+        select first_name,salary,hire_date
+        from employees
+        where  hire_date>='1987-01-01' and hire_date<'1988-01-01';
+ 
+  8)  查询2月份入职的员工的名字和入职日期 （两种方案）
+
+        方案1：
+        select first_name,salary,hire_date
+        from employees
+        where month(hire_date)='2'
+        方案2：
+        select first_name,salary,hire_date
+        from employees
+        where substring(hire_date,6,2)='02';
+        .......
+
+--------------------------------------------------------------
+1、设计一个针对某个商品的评价系统
+	
+	用户类
+	
+	商品类
+	
+	留言类
+
+2、设计一个权限管理系统
+
+	雇员类
+
+	角色类
+
+	权限类
+查询平均薪水最高的那个部门的部门名称
+select department_name,avg(salary)
+from employees e,departments d
+where e.department_id=d.department_id
+group by e.department_id
+order by avg(salary) desc
+limit 1;
+查询人数最多的那个部门的部门名称（count）
+select count(1),department_name
+from employees e,departments d
+where e.department_id=d.department_id
+group by e.department_id
+order by count(1) desc
+limit 1;
+
+查询每个部门中薪水最高的那个人的名字
+select first_name,department_name,max(e.salary)
+from employees e,departments d
+where e.department_id=d.department_id
+group by e.department_id;
+
+查询每个部门中薪水最高的前2个人的名字
+select first_name,department_id,salary
+from employees e1
+where (select count(*) from employees e2
+where e1.salary<e2.salary and e1.department_id=e2.department_id)<2;
+
+---------------------------------------------------------------------
 
 
 
