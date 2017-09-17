@@ -1,0 +1,40 @@
+---20170917
+
+--mysql 查询性能分析
+select * from user where name=""
+
+--单值索引
+create index idx_user_name on user(name)
+
+--复合索引
+
+--关联查询太多join
+
+
+--mysql 一般语句写法
+eg:
+select distinct
+	<select_list>
+from
+	<left_table> <join_type>
+join <right_table> on <join_condition>
+where
+	<where_condition>
+group by 
+	<group_by_list>
+having
+	<having_condition>
+order by 
+	<order_by_condition>
+limit <limit_number>
+
+
+
+--
+
+
+	
+	
+	
+	
+	
