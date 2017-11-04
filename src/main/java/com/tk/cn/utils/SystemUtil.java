@@ -74,7 +74,7 @@ public class SystemUtil {
 	 * @return void 返回类型
 	 */
 	public static String repalceChars(String str) {
-		String regex = "\\\\";
+		String regex = "\\\\"; 
 		String replacement = "/";
 		return str.replaceAll(regex, replacement);
 	}
