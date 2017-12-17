@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 /**
  * 
  * @author 61650
- * 
+ *  
  *         自定義拒絕策略 
  *
  */
