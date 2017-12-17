@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 
 /**
  * 
- * @author 61650 
+ * @author 61650  
  *
  */
 public class MyTask implements Runnable {
