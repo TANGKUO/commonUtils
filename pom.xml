@@ -345,13 +345,17 @@
 			<version>1.2.30</version>
 		</dependency>
 		<!-- 依赖 第三方的jar -->
+		<!-- <dependency> <groupId>ccb</groupId> <artifactId>platform</artifactId> 
+			<version>1.0</version> <scope>system</scope> <systemPath>${basedir}/lib/ccb/Platform.jar</systemPath> 
+			</dependency> -->
+
+		<!-- mongodb 依赖jar start -->
 		<dependency>
-			<groupId>ccb</groupId>
-			<artifactId>platform</artifactId>
-			<version>1.0</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/ccb/Platform.jar</systemPath>
+			<groupId>org.mongodb</groupId>
+			<artifactId>mongodb-driver</artifactId>
+			<version>3.5.0</version>
 		</dependency>
+		<!-- mongodb 依赖jar end -->
 	</dependencies>
 
 	<build>
